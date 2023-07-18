@@ -1,0 +1,18 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs
+/GoogleDocs/bin
+/GoogleDocs/.config
+/GoogleDocs/obj
+/GoogleDocs/Properties
+/GoogleDocs/wwwroot/bootstrap/scss
+*.user
+/GoogleDocs.Aplicacao/bin
+/GoogleDocs.Aplicacao/obj
+/GoogleDocs.WebSocket/bin/Debug/net7.0
+/GoogleDocs.WebSocket/obj/Debug/net7.0
+/GoogleDocs.WebSocket/obj
+/GoogleDocsProxy/bin/Debug/net7.0
+/GoogleDocsProxy/obj

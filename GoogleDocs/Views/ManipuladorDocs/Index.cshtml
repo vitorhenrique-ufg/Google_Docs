@@ -1,0 +1,339 @@
+﻿@using System.Text.Json;
+@model DocumentoModel
+@{
+    ViewData["Title"] = "Google docs";
+    var documentoPreenchido = Model != null ? JsonSerializer.Serialize(Model.Texto) : null;
+}
+
+<style>
+    .btn-group > .btn:not(:first-child):not(:last-child):not(.dropdown-toggle) {
+        border-radius: 0 !important;
+    }
+
+    blockquote p {
+        display: inline !important;
+    }
+
+    b {
+        font-weight: bold !important;
+    }
+
+    strike {
+        text-decoration: line-through !important;
+    }
+
+    u {
+        text-decoration: underline !important;
+    }
+
+    input {
+        height: auto;
+    }
+</style>
+
+<div class="p-2 bg-light border border-bottom-0 rounded-top">
+    <div class="btn-group flex-wrap" role="group">
+        <select id="tipoFonte" class="btn btn-outline-dark" onchange="aoSelecionarFonte()" data-width="100px" data-bs-toggle="tooltip" title="Fonte">
+            <option value="Arial">Arial</option>
+            <option value="CourierNew">Courier New</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Impact">Impact</option>
+            <option value="LucidaConsole">Lucida Console</option>
+            <option value="Tahoma">Tahoma</option>
+            <option value="TimesNewRoman">Times New Roman</option>
+            <option value="TrebuchetMS">Trebuchet MS</option>
+            <option value="Verdana">Verdana</option>
+        </select>
+        <select id="tamanhoFonte" class="btn btn-outline-dark" onchange="aoSelecionarTamanhoFonte()" data-width="100px" data-bs-toggle="tooltip" title="Tamanho">
+            <option value="1">1 (8pt)</option>
+            <option value="2">2 (10pt)</option>
+            <option value="3">3 (12pt)</option>
+            <option value="4">4 (14pt)</option>
+            <option value="5">5 (18pt)</option>
+            <option value="6">6 (24pt)</option>
+            <option value="7">7 (36pt)</option>
+        </select>
+    </div>
+    <div class="btn-group flex-wrap" role="group">
+        <button type="button" id="botaoH1" onclick="executeAcaoTag('H1')" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Fonte para Título">H1</button>
+        <button type="button" id="botaoH2" onclick="executeAcaoTag('H2')" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Fonte para Subtitulo">H2</button>
+        <button type="button" id="botaoH3" onclick="executeAcaoTag('H3')" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Fonte para Subtópico">H3</button>
+        <button type="button" id="botaoH4" onclick="executeAcaoTag('H4')" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Fonte para Subtópico mais Específico">H4</button>
+        <button type="button" id="botaoH5" onclick="executeAcaoTag('H5')" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Fonte para Exemplo">H5</button>
+        <button type="button" id="botaoH6" onclick="executeAcaoTag('H6')" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Fonte para Exemplo mais Específico">H6</button>
+        <button type="button" id="botaoP" onclick="executeAcaoTag('P')" class="btn btn-outline-dark active" data-bs-toggle="tooltip" title="Fonte Pequena">P</button>
+        <button type="button" id="botaoPRE" onclick="executeAcaoTag('PRE')" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Texto pré-formatado">pre</button>
+        <button type="button" id="botaoBLOCKQUOTE" onclick="executeAcaoTag('BLOCKQUOTE')" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Adicionar Citação"><i class="fa fa-quote-right"></i></button>
+    </div>
+    <div class="btn-group flex-wrap" role="group">
+        <button type="button" id="botaoB" onclick="executeAcaoTag('B')" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Negrito"><i class="fa fa-bold"></i></button>
+        <button type="button" id="botaoI" onclick="executeAcaoTag('I')" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Itálico"><i class="fa fa-italic"></i></button>
+        <button type="button" id="botaoU" onclick="executeAcaoTag('U')" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Sublinhado"><i class="fa fa-underline"></i></button>
+        <button type="button" id="botaoSTRIKE" onclick="executeAcaoTag('STRIKE')" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Riscado"><i class="fa fa-strikethrough"></i></button>
+        <button type="button" id="botaoUL" onclick="executeAcaoTag('UL')" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Marcador"><i class="fa fa-list-ul"></i></button>
+        <button type="button" id="botaoOL" onclick="executeAcaoTag('OL')" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Enumerador"><i class="fa fa-list-ol"></i></button>
+        <button type="button" id="botaoUndo" onclick="executeAcaoTag('Undo')" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Desfazer"><i class="fa fa-undo"></i></button>
+        <button type="button" id="botaoRedo" onclick="executeAcaoTag('Redo')" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Refazer"><i class="fa fa-redo"></i></button>
+        <button type="button" id="botaoJustificadoEsquerda" onclick="executeAcaoTag('JustificadoEsquerda')" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Justificado à Esquerda"><i class="fa fa-align-left"></i></button>
+        <button type="button" id="botaoJustificadoCentro" onclick="executeAcaoTag('JustificadoCentro')" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Centralizado"><i class="fa fa-align-center"></i></button>
+        <button type="button" id="botaoJustificadoDireita" onclick="executeAcaoTag('JustificadoDireita')" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Justificado à Direita"><i class="fa fa-align-right"></i></button>
+        <button type="button" id="botaoJustificado" onclick="executeAcaoTag('Justificado')" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Justificado"><i class="fa fa-align-justify"></i></button>
+        <button type="button" id="botaoIndent" onclick="executeAcaoTag('Indent')" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Aumentar Recuo"><i class="fa fa-indent"></i></button>
+        <button type="button" id="botaoOutdent" onclick="executeAcaoTag('Outdent')" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Diminuir Recuo"><i class="fa fa-outdent"></i></button>
+    </div>
+    <div class="btn-group flex-wrap" role="group">
+        <button type="button" id="botaoSPAN" onclick="executeAcaoTag('Subscript')" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Subscrito"><i class="fal fa-subscript"></i></button>
+        <button type="button" id="botaoSUP" onclick="executeAcaoTag('Superscript')" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Subscrito"><i class="fal fa-superscript"></i></button>
+    </div>
+    <div class="btn-group flex-wrap" role="group">
+        <button type="button" id="botaoCorFonte" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Cor da Fonte" disabled><i class="fa fa-light fa-font"></i></button>
+        <input type="color" id="inputCorFonte" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Cor da Fonte" value="" />
+    </div>
+    <div class="btn-group flex-wrap" role="group">
+        <button type="button" id="botaoCorFundo" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Cor do Fundo" disabled><i class="fa fa-solid fa-brush"></i></button>
+        <input type="color" id="inputCorFundo" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Cor do Fundo" value="#ffffff" />
+    </div>
+</div>
+<div class="form-group m-0" style="border-top-left-radius: 0 !important; border-top-right-radius: 0 !important; border: 1px solid !important;">
+    <div onkeyup="aoDigitar(event,this)" id="areaEdicao" class="form-text m-0 py-2 px-3" contenteditable="true" style="overflow: auto !important; white-space: pre-wrap !important; min-height: 60rem; resize: auto;"></div>
+</div>
+
+<script defer>
+    const areaEdicao = document.getElementById('areaEdicao');
+    const inputCorFonte = document.getElementById('inputCorFonte');
+    const inputCorFundo = document.getElementById('inputCorFundo');
+    const dropDownFonte = document.getElementById('tipoFonte');
+    const dropDownTamanhoFonte = document.getElementById('tamanhoFonte');
+    const tagTextos = ["H1", "H2", "H3", "H4", "H5", "H6", "P", "PRE", "B", "I", "U", "UL", "OL", "STRIKE", "BLOCKQUOTE"];
+    let guid;
+    let toolTipLink
+    let areaEdicaoAberta
+    let corFonte
+    let corFundo
+    let socket;
+
+    window.addEventListener('load', () => {
+        guid = uuidv4();
+
+        socket = new WebSocket(`ws://192.168.1.103:80/GoogleDocs.WebSocket/ws?identificador=${guid}`);
+        //socket.addEventListener('open', (event) => {
+        //    monteCardUsuario();
+        //});
+
+        socket.addEventListener('message', (event) => {
+            console.log(event.data);
+            const documento = document.getElementById('areaEdicao');
+            documento.innerHTML = JSON.parse(event.data).TextoDocumento;
+
+            const range = document.createRange();
+            const sel = window.getSelection();
+            range.selectNodeContents(documento);
+            range.collapse(false);
+            sel.removeAllRanges();
+            sel.addRange(range);
+            documento.focus();
+
+        });
+
+        preenchaDocumento();
+    });
+
+    inputCorFonte.addEventListener('change', () => {
+        corFonte = inputCorFonte.value;
+        areaEdicao.focus();
+        altereCorFonte(corFonte);
+    });
+
+    inputCorFundo.addEventListener('change', () => {
+        corFundo = inputCorFundo.value;
+        areaEdicao.focus();
+        altereCorFundo(corFundo);
+    });
+
+    function monteCardUsuario(){
+        const divCard = document.createElement('div');
+        divCard.classList.value = 'me-4 bg-primary rounded-circle text-white d-flex justify-content-center align-items-center position-relative';
+        divCard.style.width = '36px';
+        divCard.style.height = '41px';
+
+        const iconeUsuario = document.createElement('i');
+        iconeUsuario.classList.value = 'fa-solid fa-person';
+        iconeUsuario.style.fontSize = '30pt';
+
+        const spanNomeUsuario = document.createElement('span');
+        spanNomeUsuario.classList.value = 'position-absolute top-50 start-50 mt-3 translate-middle badge bg-dark border border-2 border-light';
+        spanNomeUsuario.style.fontSize = '0.5rem';
+        spanNomeUsuario.innerHTML = 'Usuario 1';
+
+        divCard.appendChild(iconeUsuario);
+        divCard.appendChild(spanNomeUsuario);
+
+        const navBar = document.getElementById('navbar-documento');
+        navBar.appendChild(divCard);
+    }
+
+    function preenchaDocumento() {
+        const documento = document.getElementById('areaEdicao');
+        if (@Html.Raw(documentoPreenchido) != null) {
+            documento.innerHTML = @Html.Raw(documentoPreenchido);
+        }
+    }
+
+    async function aoDigitar(ev, target) {
+        const teclaEspaco = 32;
+        const teclaEnter = 13;
+        const teclaBackspace = 8;
+
+        //if (!ev || ![teclaEspaco, teclaEnter, teclaBackspace].includes(ev.keyCode)) return;
+
+        envieTexto();
+    }
+
+    function envieTexto(){
+        const obj = {
+            TextoDocumento: areaEdicao.innerHTML
+        };
+
+        socket.send(JSON.stringify(obj));
+    }
+
+    function aoSelecionarFonte() {
+        let fonte = dropDownFonte.value;
+        areaEdicao.focus();
+        document.execCommand("fontname", false, fonte);
+
+        envieTexto();
+    }
+
+    function aoSelecionarTamanhoFonte() {
+        let tamanhoFonte = dropDownTamanhoFonte.value;
+        areaEdicao.focus();
+        document.execCommand('fontSize', false, tamanhoFonte);
+
+        envieTexto();
+    }
+
+    function altereCorFonte(corFonte) {
+        areaEdicao.focus();
+        document.execCommand('styleWithCSS', false, true);
+        document.execCommand('foreColor', false, corFonte);
+
+        envieTexto();
+    }
+
+    function altereCorFundo(corFundo) {
+        areaEdicao.focus();
+        document.execCommand('backColor', false, corFundo);
+
+        envieTexto();
+    }
+
+    function possuiTagTexto() {
+        const node = document.getSelection().anchorNode;
+        if (node === null) {
+            return;
+        }
+        const tags = obtenhaTagsPais(node);
+
+        return tags.some(item => tagTextos.includes(item));
+    }
+
+    function obtenhaTagsPais(node) {
+        if (node.nodeName === 'DIV') {
+            return [node.nodeName];
+        }
+
+        return [node.nodeName].concat(obtenhaTagsPais(node.parentNode));
+    }
+
+    function ajusteElementosAtivos() {
+        const selecao = document.getSelection();
+        if (selecao.anchorNode === null) {
+            return;
+        }
+        const tags = obtenhaTagsPais(selecao.anchorNode);
+
+        let tagsAtivar = tagTextos.filter(tag => tags.includes(tag));
+
+        tagsAtivar.forEach(tag => {
+            if (tag !== '#text' && tag !== 'DIV' && tag !== 'LI') {
+                const botao = document.getElementById(`botao${tag}`);
+                botao.classList.add("active");
+            }
+        });
+        let tagsDesativar = tagTextos.filter(tag => !tags.includes(tag));
+
+        tagsDesativar.forEach(tag => {
+            if (tag !== '#text' && tag !== 'DIV' && tag !== 'LI') {
+                const botao = document.getElementById(`botao${tag}`);
+                botao.classList.remove("active");
+            }
+        });
+    }
+
+    function executeAcaoTag(tag) {
+        acaoTag[tag]();
+        areaEdicao.focus();
+        altereCorFonte(corFonte);
+        ajusteElementosAtivos();
+    }
+
+    const acaoTag = {
+        B: executeAcao("bold"),
+        I: executeAcao("italic"),
+        STRIKE: executeAcao("strikethrough"),
+        U: executeAcao("underline"),
+
+        H1: executeAcao("formatblock", "h1"),
+        H2: executeAcao("formatblock", "h2"),
+        H3: executeAcao("formatblock", "h3"),
+        H4: executeAcao("formatblock", "h4"),
+        H5: executeAcao("formatblock", "h5"),
+        H6: executeAcao("formatblock", "h6"),
+        P: executeAcao("formatblock", "p"),
+        PRE: executeAcao("formatblock", "pre"),
+        BLOCKQUOTE: executeAcao("formatblock", "blockquote"),
+
+        OL: executeAcao("insertorderedlist"),
+        UL: executeAcao("insertunorderedlist"),
+
+        Undo: executeAcao("undo"),
+        Redo: executeAcao("redo"),
+
+        Indent: executeAcao("indent"),
+        Outdent: executeAcao("outdent"),
+        Clear: executeAcao("removeformat"),
+
+        JustificadoDireita: executeAcao("justifyRight"),
+        JustificadoEsquerda: executeAcao("justifyLeft"),
+        JustificadoCentro: executeAcao("justifyCenter"),
+        Justificado: executeAcao("justifyFull"),
+        QuebraLinha: executeAcao("insertParagraph"),
+
+        Subscript: executeAcao("subscript"),
+        Superscript: executeAcao("superscript"),
+    };
+
+    function executeAcao(command, param) {
+        return function (userParam) {
+            document.execCommand('styleWithCSS', false, false);
+            document.execCommand(command, false, param || userParam);
+            altereCorFonte(corFonte);
+            altereCorFundo(corFundo);
+            aoSelecionarFonte();
+            aoSelecionarTamanhoFonte();
+        };
+    }
+
+    function limparEditorHTML() {
+        areaEdicao.innerHTML = '';
+    }
+
+    function uuidv4() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            const r = Math.random() * 16 | 0,
+                v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
+</script>
