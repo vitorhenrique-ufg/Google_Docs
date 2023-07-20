@@ -2,7 +2,7 @@
 @model DocumentoModel
 @{
     ViewData["Title"] = "Google docs";
-    var documentoPreenchido = Model != null ? JsonSerializer.Serialize(Model.Texto) : null;
+    var documentoPreenchido = Model != null ? JsonSerializer.Serialize(Model.Texto) : "''";
 }
 
 <style>
@@ -61,7 +61,7 @@
         <button type="button" id="botaoH4" onclick="executeAcaoTag('H4')" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Fonte para Subtópico mais Específico">H4</button>
         <button type="button" id="botaoH5" onclick="executeAcaoTag('H5')" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Fonte para Exemplo">H5</button>
         <button type="button" id="botaoH6" onclick="executeAcaoTag('H6')" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Fonte para Exemplo mais Específico">H6</button>
-        <button type="button" id="botaoP" onclick="executeAcaoTag('P')" class="btn btn-outline-dark active" data-bs-toggle="tooltip" title="Fonte Pequena">P</button>
+        <button type="button" id="botaoP" onclick="executeAcaoTag('P')" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Fonte Pequena">P</button>
         <button type="button" id="botaoPRE" onclick="executeAcaoTag('PRE')" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Texto pré-formatado">pre</button>
         <button type="button" id="botaoBLOCKQUOTE" onclick="executeAcaoTag('BLOCKQUOTE')" class="btn btn-outline-dark" data-bs-toggle="tooltip" title="Adicionar Citação"><i class="fa fa-quote-right"></i></button>
     </div>
@@ -95,7 +95,7 @@
     </div>
 </div>
 <div class="form-group m-0" style="border-top-left-radius: 0 !important; border-top-right-radius: 0 !important; border: 1px solid !important;">
-    <div onkeyup="aoDigitar(event,this)" id="areaEdicao" class="form-text m-0 py-2 px-3" contenteditable="true" style="overflow: auto !important; white-space: pre-wrap !important; min-height: 60rem; resize: auto;"></div>
+    <div id="areaEdicao" class="form-text m-0 py-2 px-3" contenteditable="true" style="overflow: auto !important; white-space: pre-wrap !important; min-height: 60rem; resize: auto;"></div>
 </div>
 
 <script defer>
@@ -114,17 +114,17 @@
 
     window.addEventListener('load', () => {
         guid = uuidv4();
+        document.getElementById('areaEdicao').addEventListener('input', aoDigitar);
 
-        socket = new WebSocket(`ws://192.168.1.103:80/GoogleDocs.WebSocket/ws?identificador=${guid}`);
+        socket = new WebSocket(`ws://192.168.25.33:80/GoogleDocs.WebSocket/ws?identificador=${guid}`);
         //socket.addEventListener('open', (event) => {
         //    monteCardUsuario();
         //});
 
         socket.addEventListener('message', (event) => {
-            console.log(event.data);
             const documento = document.getElementById('areaEdicao');
             documento.innerHTML = JSON.parse(event.data).TextoDocumento;
-
+            
             const range = document.createRange();
             const sel = window.getSelection();
             range.selectNodeContents(documento);
@@ -132,7 +132,6 @@
             sel.removeAllRanges();
             sel.addRange(range);
             documento.focus();
-
         });
 
         preenchaDocumento();
@@ -150,7 +149,7 @@
         altereCorFundo(corFundo);
     });
 
-    function monteCardUsuario(){
+    function monteCardUsuario() {
         const divCard = document.createElement('div');
         divCard.classList.value = 'me-4 bg-primary rounded-circle text-white d-flex justify-content-center align-items-center position-relative';
         divCard.style.width = '36px';

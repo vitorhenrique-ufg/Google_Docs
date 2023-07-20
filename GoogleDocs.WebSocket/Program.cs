@@ -9,8 +9,8 @@ using GoogleDocs.WebSockets.Middlewares;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services
-       .AddScoped<IComandoInsiraDocumentoTexto, ComandoInsiraDocumentoTexto>()
-       .AddScoped<IRepositorioDocs, RepositorioDocs>()
+       .AddSingleton<IComandoInsiraDocumentoTexto, ComandoInsiraDocumentoTexto>()
+       .AddSingleton<IRepositorioDocs, RepositorioDocs>()
        .AddSingleton<WebSocketHandler>();
 
 builder.Services.AddTransient(sp =>
