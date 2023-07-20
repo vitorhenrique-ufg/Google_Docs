@@ -114,7 +114,18 @@
 
     window.addEventListener('load', () => {
         guid = uuidv4();
-        document.getElementById('areaEdicao').addEventListener('input', aoDigitar);
+        document.getElementById('areaEdicao').addEventListener('input', aoAlterarDocumento);
+        inputCorFonte.addEventListener('change', () => {
+            corFonte = inputCorFonte.value;
+            areaEdicao.focus();
+            altereCorFonte(corFonte);
+        });
+
+        inputCorFundo.addEventListener('change', () => {
+            corFundo = inputCorFundo.value;
+            areaEdicao.focus();
+            altereCorFundo(corFundo);
+        });
 
         socket = new WebSocket(`ws://192.168.25.33:80/GoogleDocs.WebSocket/ws?identificador=${guid}`);
         //socket.addEventListener('open', (event) => {
@@ -122,6 +133,7 @@
         //});
 
         socket.addEventListener('message', (event) => {
+
             const documento = document.getElementById('areaEdicao');
             documento.innerHTML = JSON.parse(event.data).TextoDocumento;
             
@@ -137,38 +149,8 @@
         preenchaDocumento();
     });
 
-    inputCorFonte.addEventListener('change', () => {
-        corFonte = inputCorFonte.value;
-        areaEdicao.focus();
-        altereCorFonte(corFonte);
-    });
-
-    inputCorFundo.addEventListener('change', () => {
-        corFundo = inputCorFundo.value;
-        areaEdicao.focus();
-        altereCorFundo(corFundo);
-    });
-
-    function monteCardUsuario() {
-        const divCard = document.createElement('div');
-        divCard.classList.value = 'me-4 bg-primary rounded-circle text-white d-flex justify-content-center align-items-center position-relative';
-        divCard.style.width = '36px';
-        divCard.style.height = '41px';
-
-        const iconeUsuario = document.createElement('i');
-        iconeUsuario.classList.value = 'fa-solid fa-person';
-        iconeUsuario.style.fontSize = '30pt';
-
-        const spanNomeUsuario = document.createElement('span');
-        spanNomeUsuario.classList.value = 'position-absolute top-50 start-50 mt-3 translate-middle badge bg-dark border border-2 border-light';
-        spanNomeUsuario.style.fontSize = '0.5rem';
-        spanNomeUsuario.innerHTML = 'Usuario 1';
-
-        divCard.appendChild(iconeUsuario);
-        divCard.appendChild(spanNomeUsuario);
-
-        const navBar = document.getElementById('navbar-documento');
-        navBar.appendChild(divCard);
+    function aoAlterarDocumento(ev, target) {
+        envieTexto();
     }
 
     function preenchaDocumento() {
@@ -176,16 +158,6 @@
         if (@Html.Raw(documentoPreenchido) != null) {
             documento.innerHTML = @Html.Raw(documentoPreenchido);
         }
-    }
-
-    async function aoDigitar(ev, target) {
-        const teclaEspaco = 32;
-        const teclaEnter = 13;
-        const teclaBackspace = 8;
-
-        //if (!ev || ![teclaEspaco, teclaEnter, teclaBackspace].includes(ev.keyCode)) return;
-
-        envieTexto();
     }
 
     function envieTexto(){
@@ -334,5 +306,27 @@
                 v = c === 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
         });
+    }
+
+    function monteCardUsuario() {
+        const divCard = document.createElement('div');
+        divCard.classList.value = 'me-4 bg-primary rounded-circle text-white d-flex justify-content-center align-items-center position-relative';
+        divCard.style.width = '36px';
+        divCard.style.height = '41px';
+
+        const iconeUsuario = document.createElement('i');
+        iconeUsuario.classList.value = 'fa-solid fa-person';
+        iconeUsuario.style.fontSize = '30pt';
+
+        const spanNomeUsuario = document.createElement('span');
+        spanNomeUsuario.classList.value = 'position-absolute top-50 start-50 mt-3 translate-middle badge bg-dark border border-2 border-light';
+        spanNomeUsuario.style.fontSize = '0.5rem';
+        spanNomeUsuario.innerHTML = 'Usuario 1';
+
+        divCard.appendChild(iconeUsuario);
+        divCard.appendChild(spanNomeUsuario);
+
+        const navBar = document.getElementById('navbar-documento');
+        navBar.appendChild(divCard);
     }
 </script>
