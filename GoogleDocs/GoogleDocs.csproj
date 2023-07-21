@@ -17,4 +17,8 @@
     <ProjectReference Include="..\GoogleDocs.Aplicacao\GoogleDocs.Aplicacao.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Scripts\" />
+  </ItemGroup>
+
 </Project>
