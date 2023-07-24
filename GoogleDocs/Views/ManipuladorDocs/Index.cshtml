@@ -133,21 +133,67 @@
         //});
 
         socket.addEventListener('message', (event) => {
-
             const documento = document.getElementById('areaEdicao');
+            const selecao = obtenhaSelecaoTexto();
+            const posicaoInicio = obtenhaIndiceNoAlvo(documento, selecao.anchorNode);
+            const posicaoFim = obtenhaIndiceNoAlvo(documento, selecao.focusNode);
+
             documento.innerHTML = JSON.parse(event.data).TextoDocumento;
-            
-            const range = document.createRange();
-            const sel = window.getSelection();
-            range.selectNodeContents(documento);
-            range.collapse(false);
-            sel.removeAllRanges();
-            sel.addRange(range);
-            documento.focus();
+
+            if(posicaoInicio == -1 || posicaoFim == -1 || !selecao.anchorNode || !selecao.focusNode)
+            {
+                return;
+            }
+
+            definaNovaSelecaoTexto(documento, selecao, posicaoInicio, posicaoFim);
         });
 
         preenchaDocumento();
     });
+
+    function obtenhaSelecaoTexto()
+    {
+        const selecao = window.getSelection();
+        return {
+            anchorNode: selecao.anchorNode,
+            anchorOffset: selecao.anchorOffset,
+            focusNode: selecao.focusNode,
+            focusOffset: selecao.focusOffset
+        }
+    }
+
+    function definaNovaSelecaoTexto(documento, selecao, posicaoInicio, posicaoFim)
+    {
+        const novoSelecao = window.getSelection();
+        const range = document.createRange();
+        const noTextoInicio = obtenhaNoText(documento.childNodes[posicaoInicio]);
+        const noTextoFim = obtenhaNoText(documento.childNodes[posicaoFim]);
+
+        range.setStart(noTextoInicio, selecao.anchorOffset);
+        range.setEnd(noTextoFim, selecao.focusOffset);
+        novoSelecao.removeAllRanges();
+        novoSelecao.addRange(range);
+    }
+
+    function obtenhaNoText(no){
+        const noTipoText = 3;
+        if(no.nodeType == noTipoText)
+        {
+            return no;
+        }
+        return obtenhaNoText(no.firstChild);
+    }
+
+    function obtenhaIndiceNoAlvo(pai, noh) {
+        const filhos = pai.childNodes;
+        for (let i = 0; i < filhos.length; i++) {
+            const noText = obtenhaNoText(filhos[i]);
+            if (noText == noh) {
+                return i;
+            }
+        }
+        return -1;
+    }
 
     function aoAlterarDocumento(ev, target) {
         envieTexto();
@@ -160,7 +206,7 @@
         }
     }
 
-    function envieTexto(){
+    function envieTexto() {
         const obj = {
             TextoDocumento: areaEdicao.innerHTML
         };
