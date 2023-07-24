@@ -175,7 +175,10 @@
         novoSelecao.addRange(range);
     }
 
-    function obtenhaNoText(no){
+    function obtenhaNoText(no)
+    {
+        if(!no) return;
+
         const noTipoText = 3;
         if(no.nodeType == noTipoText)
         {
